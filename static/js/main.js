@@ -1,219 +1,168 @@
-// State Management
-let facilities = [];
-let idCounter = 0;
+// DSR Calculator - Client-side Interactive Logic
 
-// DOM Elements
-const entryForm = document.getElementById('entryForm');
-const facilityList = document.getElementById('facilityList');
-const emptyState = document.getElementById('emptyState');
-const clearAllBtn = document.getElementById('clearAllBtn');
+document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const nettIncomeInput = document.getElementById('nettIncome');
+    const maxDsrInput = document.getElementById('maxDsr');
+    const maxCommitmentInput = document.getElementById('maxCommitment');
+    const commitmentsList = document.getElementById('commitmentsList');
+    const addCommitmentBtn = document.getElementById('addCommitmentBtn');
+    const totalCommitmentDisplay = document.getElementById('totalCommitmentDisplay');
+    const dsrBalanceCard = document.getElementById('dsrBalanceCard');
+    const dsrBalanceVal = document.getElementById('dsrBalanceVal');
+    const dsrBalanceStatus = document.getElementById('dsrBalanceStatus');
+    const resetBtn = document.getElementById('resetBtn');
 
-// Dashboard Elements
-const totalCommitmentDisplay = document.getElementById('totalCommitmentDisplay');
-const consoCard = document.getElementById('consoCard');
-const projectedCommitmentDisplay = document.getElementById('projectedCommitmentDisplay');
-const consoSavingsDisplay = document.getElementById('consoSavingsDisplay');
+    let rowCounter = 0;
 
-// Sub-totals Elements
-const slCount = document.getElementById('slCount');
-const slCommitment = document.getElementById('slCommitment');
-const plCount = document.getElementById('plCount');
-const plCommitment = document.getElementById('plCommitment');
-const ccCount = document.getElementById('ccCount');
-const ccCommitment = document.getElementById('ccCommitment');
-
-// Input Formatters
-function formatCurrency(amount) {
-    return parseFloat(amount).toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
-}
-
-function parseCurrency(str) {
-    if (!str) return 0;
-    const num = parseFloat(str.replace(/,/g, ''));
-    return isNaN(num) ? 0 : num;
-}
-
-// Add Facility Event
-entryForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const category = document.getElementById('inputCategory').value;
-    const name = document.getElementById('inputName').value.trim() || 'Unnamed Facility';
-    const limit = parseCurrency(document.getElementById('inputLimit').value);
-    const outstanding = parseCurrency(document.getElementById('inputOutstanding').value);
-    let commitmentInput = document.getElementById('inputCommitment').value;
-    const isConso = document.getElementById('inputConso').checked;
-
-    // specific Credit Card rule: Auto-calculate 5% of outstanding if commitment is empty
-    let commitment = 0;
-    if (category === 'Credit Cards' && outstanding > 0 && !commitmentInput) {
-        commitment = outstanding * 0.05;
-    } else {
-        commitment = parseCurrency(commitmentInput);
+    // Format utility for RM Currency
+    function formatCurrency(amount) {
+        const isNegative = amount < 0;
+        const absVal = Math.abs(amount);
+        const formatted = absVal.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+        return isNegative ? `-RM ${formatted}` : `RM ${formatted}`;
     }
 
-    const facility = {
-        id: idCounter++,
-        category,
-        name,
-        limit,
-        outstanding,
-        commitment,
-        isConso
-    };
+    // Main DSR calculation logic
+    function calculateDSR() {
+        // 1. Get and parse inputs
+        const nettIncome = parseFloat(nettIncomeInput.value) || 0;
+        const maxDsr = parseFloat(maxDsrInput.value) || 0;
 
-    facilities.push(facility);
-    
-    // Reset Form
-    entryForm.reset();
-    document.getElementById('inputCategory').focus();
+        // 2. Calculate Maximum Eligible Commitment
+        const maxEligibleCommitment = nettIncome * (maxDsr / 100);
+        maxCommitmentInput.value = maxEligibleCommitment.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
 
-    renderFacilities();
-});
+        // 3. Sum up all active commitments
+        let totalCommitment = 0;
+        const commitmentFields = commitmentsList.querySelectorAll('.commitment-input');
+        commitmentFields.forEach(input => {
+            totalCommitment += parseFloat(input.value) || 0;
+        });
 
-// Remove Facility
-function removeFacility(id) {
-    const row = document.getElementById(`row-${id}`);
-    if (row) {
-        row.classList.add('row-exit');
-        setTimeout(() => {
-            facilities = facilities.filter(f => f.id !== id);
-            renderFacilities();
-        }, 200); // Wait for animation to finish
-    } else {
-        facilities = facilities.filter(f => f.id !== id);
-        renderFacilities();
-    }
-}
+        // 4. Update total commitments display
+        totalCommitmentDisplay.textContent = formatCurrency(totalCommitment);
 
-// Render the List and Update Dashboard
-function renderFacilities() {
-    facilityList.innerHTML = '';
-    
-    if (facilities.length === 0) {
-        emptyState.style.display = 'flex';
-        updateDashboard();
-        return;
-    }
+        // 5. Calculate DSR Balance
+        const dsrBalance = maxEligibleCommitment - totalCommitment;
+        dsrBalanceVal.textContent = formatCurrency(dsrBalance);
 
-    emptyState.style.display = 'none';
-
-    facilities.forEach(facility => {
-        const row = document.createElement('div');
-        row.id = `row-${facility.id}`;
-        // Determine icons based on category
-        let iconHtml = '';
-        if (facility.category === 'Secure Loans') {
-            iconHtml = `<i class="fa-solid fa-house text-blue-500"></i>`;
-        } else if (facility.category === 'PLOANS') {
-            iconHtml = `<i class="fa-solid fa-money-bill-wave text-purple-500"></i>`;
+        // 6. Style spotlight card based on eligibility
+        if (dsrBalance >= 0) {
+            dsrBalanceCard.className = 'dsr-balance-card eligible';
+            dsrBalanceStatus.innerHTML = `
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Customer Eligible</span>
+            `;
         } else {
-            iconHtml = `<i class="fa-solid fa-credit-card text-orange-500"></i>`;
+            dsrBalanceCard.className = 'dsr-balance-card exceeded';
+            dsrBalanceStatus.innerHTML = `
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Limit Exceeded</span>
+            `;
         }
+    }
 
-        // Apply Conso styling
-        let rowClasses = "row-enter bg-slate-50 border border-slate-200 rounded-lg p-3 grid grid-cols-12 gap-4 items-center text-sm shadow-sm transition-all";
-        if (facility.isConso) {
-            rowClasses += " row-conso";
-        }
+    // Update commitment label indices sequentially
+    function updateRowLabels() {
+        const rows = commitmentsList.querySelectorAll('.commitment-row');
+        rows.forEach((row, index) => {
+            const label = row.querySelector('.commitment-label');
+            label.textContent = `Commitment ${index + 1}`;
+        });
+    }
 
-        row.className = rowClasses;
+    // Create a new commitment row
+    function createCommitmentRow(value = "") {
+        rowCounter++;
+        const rowId = `commitment-row-${rowCounter}`;
+        const inputId = `commitment-input-${rowCounter}`;
+
+        const row = document.createElement('div');
+        row.className = 'commitment-row row-added';
+        row.id = rowId;
+
         row.innerHTML = `
-            <div class="col-span-2 flex items-center space-x-2 font-medium text-slate-700">
-                ${iconHtml}
-                <span class="truncate" title="${facility.category}">${facility.category.replace('Loans', '').replace('Cards', '').trim()}</span>
+            <div class="commitment-inputs">
+                <span class="commitment-label">Commitment</span>
+                <div class="input-group">
+                    <span class="input-addon">RM</span>
+                    <input type="number" id="${inputId}" class="input-field commitment-input" placeholder="0.00" step="any" min="0" value="${value}">
+                </div>
             </div>
-            <div class="col-span-3 font-semibold text-slate-800 truncate" title="${facility.name}">
-                ${facility.name}
-                ${facility.isConso ? '<span class="ml-2 text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold uppercase">Conso</span>' : ''}
-            </div>
-            <div class="col-span-2 text-right text-slate-600">
-                ${facility.limit > 0 ? formatCurrency(facility.limit) : '-'}
-            </div>
-            <div class="col-span-2 text-right text-slate-600">
-                ${facility.outstanding > 0 ? formatCurrency(facility.outstanding) : '-'}
-            </div>
-            <div class="col-span-2 text-right font-bold text-slate-800">
-                ${formatCurrency(facility.commitment)}
-            </div>
-            <div class="col-span-1 text-center flex justify-center">
-                <button onclick="removeFacility(${facility.id})" class="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-md transition-colors" title="Delete">
-                    <i class="fa-solid fa-trash-can"></i>
-                </button>
-            </div>
+            <button type="button" class="btn-delete" title="Remove Commitment">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
         `;
-        facilityList.appendChild(row);
-    });
 
-    updateDashboard();
-}
+        // Add event listener to delete button
+        row.querySelector('.btn-delete').addEventListener('click', function() {
+            row.remove();
+            updateRowLabels();
+            calculateDSR();
+        });
 
-// Calculate and Update Dashboard Numbers
-function updateDashboard() {
-    let totals = {
-        slCount: 0, slCommitment: 0,
-        plCount: 0, plCommitment: 0,
-        ccCount: 0, ccCommitment: 0,
-        masterCommitment: 0,
-        consoCommitment: 0,
-        hasConso: false
-    };
+        return row;
+    }
 
-    facilities.forEach(f => {
-        totals.masterCommitment += f.commitment;
+    // Add commitment action
+    function addCommitmentRow(value = "") {
+        const row = createCommitmentRow(value);
+        commitmentsList.appendChild(row);
+        updateRowLabels();
         
-        if (f.isConso) {
-            totals.consoCommitment += f.commitment;
-            totals.hasConso = true;
+        // Focus the newly added input field
+        const inputField = row.querySelector('.commitment-input');
+        if (inputField) {
+            inputField.focus();
         }
+    }
 
-        if (f.category === 'Secure Loans') {
-            totals.slCount++;
-            totals.slCommitment += f.commitment;
-        } else if (f.category === 'PLOANS') {
-            totals.plCount++;
-            totals.plCommitment += f.commitment;
-        } else if (f.category === 'Credit Cards') {
-            totals.ccCount++;
-            totals.ccCommitment += f.commitment;
+    // Reset the application to starting state
+    function resetForm() {
+        nettIncomeInput.value = '';
+        maxDsrInput.value = '60';
+        commitmentsList.innerHTML = '';
+        
+        // Load initial 3 commitment rows
+        for (let i = 0; i < 3; i++) {
+            const row = createCommitmentRow();
+            commitmentsList.appendChild(row);
+        }
+        
+        updateRowLabels();
+        calculateDSR();
+        nettIncomeInput.focus();
+    }
+
+    // --- Event Listeners ---
+
+    // Listen to changes on inputs in Section 1
+    nettIncomeInput.addEventListener('input', calculateDSR);
+    maxDsrInput.addEventListener('input', calculateDSR);
+
+    // Event delegation for dynamically added commitments
+    commitmentsList.addEventListener('input', function(e) {
+        if (e.target.classList.contains('commitment-input')) {
+            calculateDSR();
         }
     });
 
-    // Update Sub-totals
-    slCount.textContent = totals.slCount;
-    slCommitment.textContent = formatCurrency(totals.slCommitment);
-    
-    plCount.textContent = totals.plCount;
-    plCommitment.textContent = formatCurrency(totals.plCommitment);
-    
-    ccCount.textContent = totals.ccCount;
-    ccCommitment.textContent = formatCurrency(totals.ccCommitment);
+    // Plus button click
+    addCommitmentBtn.addEventListener('click', function() {
+        addCommitmentRow();
+        calculateDSR();
+    });
 
-    // Update Master Total
-    totalCommitmentDisplay.textContent = formatCurrency(totals.masterCommitment);
+    // Reset button click
+    resetBtn.addEventListener('click', resetForm);
 
-    // Update Conso Card
-    if (totals.hasConso) {
-        consoCard.classList.remove('hidden');
-        const projected = totals.masterCommitment - totals.consoCommitment;
-        projectedCommitmentDisplay.textContent = formatCurrency(projected);
-        consoSavingsDisplay.textContent = `RM ${formatCurrency(totals.consoCommitment)}`;
-    } else {
-        consoCard.classList.add('hidden');
-    }
-}
-
-// Clear All Functionality
-clearAllBtn.addEventListener('click', () => {
-    if (facilities.length > 0 && confirm('Are you sure you want to clear all data?')) {
-        facilities = [];
-        renderFacilities();
-        entryForm.reset();
-    }
+    // Initialize layout
+    resetForm();
 });
-
-// Initial Render
-renderFacilities();
