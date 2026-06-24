@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DSR Calculator | NEX Advisory</title>
+  <meta name="description" content="Internal sales calculator tool to determine customer debt service ratio (DSR) and eligibility.">
+  <link rel="stylesheet" href="style.css">
+  <!-- Modern clean typography from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-title-group">
+        <h1>DSR Calculator</h1>
+        <p class="subtitle">Internal Sales Tool</p>
+      </div>
+      <button type="button" id="reset-btn" class="btn-reset" aria-label="Reset calculator">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+        </svg>
+        Reset
+      </button>
+    </header>
+
+    <main class="calculator-grid">
+      <!-- Left Column: Inputs -->
+      <div class="input-column">
+        <!-- Section 1: Customer Income -->
+        <section class="card" id="income-section">
+          <h2>Customer Income</h2>
+          <div class="input-group">
+            <label for="net-income">Net Income (Gaji Bersih)</label>
+            <div class="input-wrapper">
+              <span class="input-prefix">RM</span>
+              <input type="text" id="net-income" class="currency-input" placeholder="0.00" autocomplete="off" inputmode="decimal">
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 2: Maximum DSR % -->
+        <section class="card" id="dsr-section">
+          <h2>Maximum DSR %</h2>
+          <div class="input-group">
+            <label for="max-dsr">Maximum DSR %</label>
+            <div class="input-wrapper">
+              <input type="text" id="max-dsr" class="percentage-input" placeholder="60" value="60" autocomplete="off" inputmode="numeric">
+              <span class="input-suffix">%</span>
+            </div>
+          </div>
+          <div class="helper-display">
+            <span>Maximum Eligible Commitment</span>
+            <strong id="max-eligible-display">RM 0.00</strong>
+          </div>
+        </section>
+
+        <!-- Section 3: Existing Commitments -->
+        <section class="card" id="commitments-section">
+          <div class="commitments-header">
+            <h2>Existing Commitments</h2>
+            <button type="button" id="add-commitment-btn" class="btn-add">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Add Commitment
+            </button>
+          </div>
+          
+          <div id="commitments-container" class="commitments-container">
+            <!-- Commitment rows will be dynamically populated here -->
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Column: Summary Card -->
+      <div class="summary-column">
+        <aside id="summary-card" class="summary-card status-neutral">
+          <div class="summary-header">
+            <span class="summary-label">Eligibility Status</span>
+            <div id="status-badge" class="status-badge">
+              <span class="status-icon">➖</span>
+              <span class="status-text">Pending</span>
+            </div>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="summary-metrics">
+            <div class="metric-row">
+              <span class="metric-label">Max Eligible Commitment</span>
+              <span id="summary-max-eligible" class="metric-value">RM 0.00</span>
+            </div>
+            
+            <div class="metric-row">
+              <span class="metric-label">Total Existing Commitment</span>
+              <span id="summary-total-commitment" class="metric-value">RM 0.00</span>
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="metric-row main-metric">
+              <span class="metric-label">DSR Balance</span>
+              <span id="summary-dsr-balance" class="metric-value">RM 0.00</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>

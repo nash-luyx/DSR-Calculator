@@ -1,0 +1,502 @@
+/* DSR Calculator Style Sheet - NEX Advisory V2 */
+
+/* --- Design Tokens --- */
+:root {
+  /* Colors */
+  --primary: #0066cc; /* Premium Apple blue */
+  --primary-hover: #0052a3;
+  --bg-app: #f4f6f8; /* Soft neutral background */
+  --bg-card: #ffffff;
+  --text-main: #1d1d1f; /* Apple gray-dark */
+  --text-secondary: #515154;
+  --text-muted: #86868b;
+  --border: #d2d2d7;
+  --border-focus: #0066cc;
+  --ring-focus: rgba(0, 102, 204, 0.15);
+  
+  /* Status Colors: Neutral */
+  --summary-bg: #ffffff;
+  --summary-border: #d2d2d7;
+  --summary-text: #1d1d1f;
+  --summary-label-color: #515154;
+  --summary-accent: #0066cc;
+  --summary-divider: #e5e5ea;
+  --summary-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+
+  /* Status Colors: Eligible */
+  --eligible-bg: #f2fbf4;
+  --eligible-border: #a7f3d0;
+  --eligible-text: #064e3b;
+  --eligible-label-color: #047857;
+  --eligible-accent: #10b981;
+  --eligible-divider: #d1fae5;
+  --eligible-shadow: 0 12px 30px -5px rgba(16, 185, 129, 0.15), 0 4px 12px -2px rgba(16, 185, 129, 0.05);
+
+  /* Status Colors: Exceeded */
+  --exceeded-bg: #fff5f5;
+  --exceeded-border: #fecaca;
+  --exceeded-text: #7f1d1d;
+  --exceeded-label-color: #b91c1c;
+  --exceeded-accent: #ef4444;
+  --exceeded-divider: #fee2e2;
+  --exceeded-shadow: 0 12px 30px -5px rgba(239, 68, 68, 0.15), 0 4px 12px -2px rgba(239, 68, 68, 0.05);
+
+  /* Layout & Spacing */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- Base & Reset --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Header Section --- */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.header-title-group h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text-main);
+}
+
+.header-title-group .subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* --- Grid Layout --- */
+.calculator-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 32px;
+  align-items: start;
+}
+
+.input-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* --- Card Styles --- */
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.card h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  letter-spacing: -0.1px;
+}
+
+/* --- Form Fields & Inputs --- */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-card);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  overflow: hidden;
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 4px var(--ring-focus);
+}
+
+.input-prefix,
+.input-suffix {
+  padding: 12px 14px;
+  background-color: #f5f5f7;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 15px;
+  user-select: none;
+  border-right: 1px solid var(--border);
+}
+
+.input-suffix {
+  border-right: 0;
+  border-left: 1px solid var(--border);
+}
+
+.input-wrapper input {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
+  outline: none;
+  font-family: inherit;
+  width: 100%;
+}
+
+.input-wrapper input::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* --- Section 2 Extras --- */
+.helper-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding: 14px 16px;
+  background-color: #f5f5f7;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+}
+
+.helper-display span {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.helper-display strong {
+  color: var(--primary);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* --- Section 3: Commitments List --- */
+.commitments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.commitments-header h2 {
+  margin-bottom: 0;
+}
+
+.commitments-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.commitment-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideIn var(--transition-fast) forwards;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Buttons --- */
+.btn-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-reset:hover {
+  background-color: #f5f5f7;
+  color: var(--text-main);
+  border-color: #c7c7cc;
+}
+
+.btn-reset svg {
+  transition: transform var(--transition-normal);
+}
+
+.btn-reset:hover svg {
+  transform: rotate(-180deg);
+}
+
+.btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #eef6ff;
+  border: 1px solid #cce3ff;
+  color: var(--primary);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-add:hover {
+  background-color: #dbeaff;
+  color: var(--primary-hover);
+}
+
+.btn-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-delete:hover {
+  background-color: #fff1f2;
+  color: #ef4444;
+  border-color: #fee2e2;
+}
+
+/* --- Summary Card Column --- */
+.summary-column {
+  position: sticky;
+  top: 32px;
+}
+
+.summary-card {
+  border-radius: var(--radius-lg);
+  padding: 32px 24px;
+  transition: background-color var(--transition-normal), 
+              border var(--transition-normal), 
+              color var(--transition-normal),
+              box-shadow var(--transition-normal);
+}
+
+/* Dynamic State Mapping Styles */
+.status-neutral {
+  background-color: var(--summary-bg);
+  border: 1px solid var(--summary-border);
+  color: var(--summary-text);
+  box-shadow: var(--summary-shadow);
+}
+.status-neutral .summary-divider {
+  background-color: var(--summary-divider);
+}
+.status-neutral .metric-label {
+  color: var(--summary-label-color);
+}
+.status-neutral .metric-value {
+  color: var(--summary-text);
+}
+.status-neutral .status-badge {
+  background-color: #f5f5f7;
+  border: 1px solid #e5e5ea;
+  color: var(--text-secondary);
+}
+
+.status-eligible {
+  background-color: var(--eligible-bg);
+  border: 1px solid var(--eligible-border);
+  color: var(--eligible-text);
+  box-shadow: var(--eligible-shadow);
+}
+.status-eligible .summary-divider {
+  background-color: var(--eligible-divider);
+}
+.status-eligible .metric-label {
+  color: var(--eligible-label-color);
+}
+.status-eligible .metric-value {
+  color: var(--eligible-text);
+}
+.status-eligible .status-badge {
+  background-color: #d1fae5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.status-exceeded {
+  background-color: var(--exceeded-bg);
+  border: 1px solid var(--exceeded-border);
+  color: var(--exceeded-text);
+  box-shadow: var(--exceeded-shadow);
+}
+.status-exceeded .summary-divider {
+  background-color: var(--exceeded-divider);
+}
+.status-exceeded .metric-label {
+  color: var(--exceeded-label-color);
+}
+.status-exceeded .metric-value {
+  color: var(--exceeded-text);
+}
+.status-exceeded .status-badge {
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+/* Card Internals */
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summary-label {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all var(--transition-normal);
+}
+
+.summary-divider {
+  height: 1px;
+  margin: 24px 0;
+  transition: background-color var(--transition-normal);
+}
+
+.summary-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.metric-label {
+  font-size: 14px;
+  font-weight: 500;
+  transition: color var(--transition-normal);
+}
+
+.metric-value {
+  font-size: 18px;
+  font-weight: 700;
+  transition: color var(--transition-normal);
+}
+
+.main-metric {
+  margin-top: 4px;
+}
+
+.main-metric .metric-label {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.main-metric .metric-value {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 850px) {
+  .app-container {
+    padding: 24px 16px;
+  }
+  
+  .app-header {
+    margin-bottom: 24px;
+  }
+  
+  .header-title-group h1 {
+    font-size: 24px;
+  }
+
+  .calculator-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .summary-column {
+    position: static; /* Flows underneath the inputs on mobile */
+  }
+
+  .summary-card {
+    padding: 24px;
+  }
+
+  .main-metric .metric-value {
+    font-size: 22px;
+  }
+}
