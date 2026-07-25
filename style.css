@@ -1,4 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* DSR Calculator Style Sheet - NEX Advisory V2 */
+
 
 /* --- Design Tokens --- */
 :root {
